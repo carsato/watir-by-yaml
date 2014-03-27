@@ -1,0 +1,33 @@
+conf:
+  host: "drupalsite.es"
+  proxy: "your-proxy.es:8080"
+  no_proxy: "exclude.from.proxy.es,another.es"
+watir:
+  #log in
+- element:
+    type: "actions"
+    conf:
+      autofill: true
+    url: "http://drupalsite.es/es/user"
+    actions:
+      - action:
+          type: 'fill'
+          element: 
+            type: 'text_field'
+            locator: 'name'
+            locate: 'name'
+          value: 'username'
+      - action:
+          type: 'fill'
+          element: 
+            type: 'text_field'
+            locator: 'name'
+            locate: 'pass'
+          value: 'userpass'
+      - action:
+          type: 'click'
+          element: 
+            type: 'button'
+            locator: 'id'
+            locate: 'edit-submit'
+          value:
