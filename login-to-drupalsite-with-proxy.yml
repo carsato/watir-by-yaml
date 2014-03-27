@@ -3,7 +3,6 @@ conf:
   proxy: "your-proxy.es:8080"
   no_proxy: "exclude.from.proxy.es,another.es"
 watir:
-  #log in
 - element:
     type: "actions"
     conf:
