@@ -33,7 +33,7 @@ def log(elem, text = '')
 end
 
 profile = Selenium::WebDriver::Firefox::Profile.from_name 'watir'
-profile.add_extension "#{Dir.pwd}/extensions/autoauth-2.1-fx+fn.xpi"
+#profile.add_extension "#{Dir.pwd}/extensions/autoauth-2.1-fx+fn.xpi"
 
 if $proxy.nil?
   ENV['HTTP_PROXY'] = ENV['http_proxy'] = nil
