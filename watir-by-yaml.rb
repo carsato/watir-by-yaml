@@ -33,7 +33,7 @@ def log(elem, text = '')
 end
 
 profile = Selenium::WebDriver::Firefox::Profile.from_name 'watir'
-#profile.add_extension "#{Dir.pwd}/extensions/autoauth-2.1-fx+fn.xpi"
+profile.add_extension "#{Dir.pwd}/extensions/autoauth-2.1-fx+fn.xpi"
 
 if $proxy.nil?
   ENV['HTTP_PROXY'] = ENV['http_proxy'] = nil
@@ -102,15 +102,15 @@ def autofill_element(browser, action)
   element = action['element']
   case element['type']
   when 'text_fields'
-    autofill_text_fields(browser)
+    autofill_text_fields(browser, action)
   when 'select_lists'
-    autofill_select_lists(browser)
+    autofill_select_lists(browser, action)
   else
     log element, "autofill"
   end
 end
 
-def autofill_text_fields(browser)
+def autofill_text_fields(browser, action = nil)
   browser.text_fields.each do |txt|
     if txt.visible? and not txt.disabled?
       txt.set txt.name
@@ -118,7 +118,9 @@ def autofill_text_fields(browser)
   end
 end
 
-def autofill_select_lists(browser)
+def autofill_select_lists(browser, action = nil)
+  exclude = action['exclude'] if not action.nil?
+  log exclude, "excluidos"
   browser.selects.each do |slct|
     ap slct.name
     if slct.visible? and slct.enabled? and slct != nil
@@ -128,7 +130,7 @@ def autofill_select_lists(browser)
       begin
         option = opciones.sample(1).join("")
         log option
-      end while option == "" or option == nil 
+      end while option == "" or option == nil or exclude.include? option
       slct.select option
     end
   end
@@ -244,3 +246,5 @@ ARGV.each do |arg|
     end
   end
 end
+
+#at_exit { b.close if b }
