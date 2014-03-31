@@ -74,10 +74,64 @@ def process_action(browser, action)
     autofill_element(browser, v)
   when 'click'
     click_element(browser, v)
+  when 'focus'
+    focus_element(browser, v)
   when 'read'
     read_element(browser, v)
+  when 'close'
+    close_element(browser, v)
+  when 'wait'
+    wait_element(browser, v)
+  when 'send_key'
+    send_key_element(browser, v)
   else
     log v['type'], 'process_action: type'
+  end
+end
+
+def send_key_element(browser, action)
+  log action, 'close_element'
+  conf = action['conf'] unless action['conf'].nil?
+  element = action['element']
+  case element['type']
+  when 'window'
+    #close_window(browser, element)
+    window = locate_element(browser, element)
+    window.use
+    if action['value'].start_with? ':'
+      browser.send_keys action['value'][1..-1].to_sym
+    else
+      browser.send_keys action['value']
+    end
+  else
+    els = locate_element(browser, element)
+    log els,'located elements'
+    els.each do |el|
+      el.text
+      el.name
+      el.id
+    end
+  end
+end
+
+
+def close_element(browser, action)
+  log action, 'close_element'
+  conf = action['conf'] unless action['conf'].nil?
+  element = action['element']
+  case element['type']
+  when 'window'
+    #close_window(browser, element)
+    window = locate_element(browser, element)
+    window.close
+  else
+    els = locate_element(browser, element)
+    log els,'located elements'
+    els.each do |el|
+      el.text
+      el.name
+      el.id
+    end
   end
 end
 
@@ -139,12 +193,13 @@ end
 def read_text_fields(browser)
   browser.text_fields.each do |txt|
     puts %{
-type: 'fill'
-element: 
-  type: 'text_field'
-  locator: 'name'
-  locate: '#{txt.name}'
-value: '#{txt.name}'
+- action:
+    type: 'fill'
+    element: 
+      type: 'text_field'
+      locator: 'name'
+      locate: '#{txt.name}'
+    value: '#{txt.name}'
     }
   end
 end
@@ -162,6 +217,27 @@ def fill_element(browser, action)
       el.set action['value']
     end
   end
+end
+
+def wait_element(browser, action)
+  log action, 'wait_element'
+  conf = action['conf'] unless action['conf'].nil?
+  sleep action['value'].to_i
+  browser
+end
+
+def focus_element(browser, action)
+  log action, 'focus_element'
+  conf = action['conf'] unless action['conf'].nil?
+  element = action['element']
+  el = locate_element(browser, element)
+  if not el.nil?
+    if el.visible?
+      log el, "focus"
+      el.focus
+    end
+  end
+  browser
 end
 
 def click_element(browser, action)
@@ -183,6 +259,8 @@ def click_element(browser, action)
   if not el.nil?
     #log el, "element located"
     if el.visible?
+      log el.text, 'texto del elemento'
+      log el.text, 'texto del elemento'
       el.click
       puts ""
       puts ""
@@ -223,6 +301,8 @@ def locate_element(browser, element)
       browser.text_fields
   when 'select_list'
       browser.select_list :"#{element['locator']}" => element['locate']
+  when 'window'
+      browser.window :"#{element['locator']}" => element['locate']
   else
       browser.text :"#{element['locator']}" => element['locate']
   end
